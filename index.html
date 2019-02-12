@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat App</title>
+
+    <style>
+        body{
+            background: #f9f9f9;
+        }
+        .container {
+            width: 700px;
+            margin: 0 auto;      
+        }
+
+        #chatWindow {
+            height: 300px;
+        }
+        #mainWrapper{
+            display: none;
+        
+        }
+        #chatWrapper {
+            float: left;
+            border: 1px #ccc solid;
+            border-radius: 10px;
+            background: #f4f4f4;
+            padding: 10px;
+        }
+
+        #userWrapper{
+            float: left;
+            border: 1px #ccc solid;
+            border-radius: 10px;
+            background: #f4f4f4;
+            padding: 10px;
+            margin-left: 20px;
+            width: 150px;
+            max-height: 200px;
+        }
+
+        #nameWrapper{
+            float: left;
+            border: 1px #ccc solid;
+            border-radius: 10px;
+            background: #f4f4f4;
+            padding: 10px;
+            margin-left: 20px;
+        }
+
+        input{
+            height: 30px;
+            border: solid 1px #ccc;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="nameWrapper">
+            <h2>Chat Application</h2>
+            <p>Create Username: </p>
+            <div id="error"></div>
+            <form action="" id="usernameForm">
+                <input size="35" id="username" type="text" />
+                <input type="submit" value="Submit" />
+            </form>
+        </div>
+
+        <div id="mainWrapper">
+            <h2>Chat Application</h2>
+            <div id="chatWrapper">
+                <div id="chatWindow"></div>
+                <form action="" id="messageForm">
+                    <input size="35" id="message" type="text" placeholder="Say Something..."/>
+                    <input type="submit" value="Submit" />
+                </form>
+            </div>
+
+            <div id="userWrapper">
+                <div id="users"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(function() {
+            let socket = io.connect();
+            let messageForm = $('#messageForm');
+            let message = $('#message');
+            let chat = $('#chatWindow');
+            let usernameForm = $('#usernameForm');
+            let users = $('#users');
+            let username = $('#username');
+            let error = $('#error')
+
+
+            usernameForm.submit((e) =>  {
+                e.preventDefault();
+                // console.log('submiteed')
+                socket.emit('new user', username.val(), (data) => {
+                    if(data) {
+                        console.log(data)
+                        $('#nameWrapper').hide();
+                        $('#mainWrapper').show();
+                    }else{
+                        error.html('Username is taken');
+                    }
+                });
+                // message.val('');
+            })
+
+            socket.on('usernames', (data) => {
+                let html = '';
+                data.forEach(item => {
+                    html += item + '<br>'
+                })
+                users.html(html);
+            })
+
+            messageForm.submit((e) =>  {
+                e.preventDefault();
+                // console.log('submiteed')
+                socket.emit('message', message.val());
+                message.val('');
+            })
+
+            socket.on('new message', (data) => {
+                chat.append(`<strong>${data.user}</strong>: ${data.msg}<br>`)
+            })
+        })
+    </script>
+</body>
+</html>
