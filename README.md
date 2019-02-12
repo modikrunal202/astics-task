@@ -1,2 +1,2 @@
 Application Demo:
-https://demo-chat-application.herokuapp.com/?
+https://demo-chat-application.herokuapp.com/
