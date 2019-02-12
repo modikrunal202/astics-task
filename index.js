@@ -4,6 +4,7 @@ let express = require('express'),
     io = require('socket.io').listen(server),
     dialgoflow = require('dialogflow');
     usernames = [];
+    port = process.env.PORT || 6502
 
 app.get('/', async (req, res) => {
     res.sendFile(__dirname + '/index.html')
@@ -48,6 +49,6 @@ io.sockets.on('connection', (socket) => {
     })
 })
 
-server.listen(6502, () => {
-    console.log("Server Running on 6502")
+server.listen(port, () => {
+    console.log("Server Running on ", port)
 })
